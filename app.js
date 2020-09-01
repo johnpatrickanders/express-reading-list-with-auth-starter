@@ -1,23 +1,31 @@
-
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 
+const { restoreUser } = require('./auth');
+const { sessionSecret } = require('./config');
 const bookRoutes = require('./routes/book');
 const userRoutes = require('./routes/user');
 
-const bodyParser = require('body-parser');
-const { csrfProtection } = require('./routes/utils');
-
 const app = express();
-app.set('view engine', 'pug');
-app.use(cookieParser());
-app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(express.urlencoded({ extended: false }));
 
+app.set('view engine', 'pug');
+app.use(morgan('dev'));
+app.use(cookieParser(sessionSecret));
+app.use(session({
+  name: 'reading-list.sid',
+  secret: sessionSecret,
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(express.urlencoded({ extended: false }));
+app.use(restoreUser);
 app.use(bookRoutes);
 app.use(userRoutes);
+
+
+
 
 
 
