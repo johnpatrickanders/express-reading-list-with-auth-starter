@@ -3,15 +3,28 @@ const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 
-const routes = require('./routes');
+const bookRoutes = require('./routes/book');
+const userRoutes = require('./routes/user');
+
+const bodyParser = require('body-parser');
+const { csrfProtection } = require('./routes/utils');
 
 const app = express();
-
 app.set('view engine', 'pug');
-app.use(morgan('dev'));
 app.use(cookieParser());
+app.use(morgan('dev'));
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.urlencoded({ extended: false }));
-app.use(routes);
+
+app.use(bookRoutes);
+app.use(userRoutes);
+
+
+
+
+
+
+
 
 // Catch unhandled requests and forward to error handler.
 app.use((req, res, next) => {
@@ -19,6 +32,9 @@ app.use((req, res, next) => {
   err.status = 404;
   next(err);
 });
+
+
+
 
 // Custom error handlers.
 
